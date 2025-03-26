@@ -1,53 +1,47 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import emailjs from "@emailjs/browser";
 
 export default function Connect() {
-  // Example: contact cards data (icon, label, handle, link)
+  // Contact links
   const contacts = [
-    {
-      icon: "/mail.png",
-      label: "Email",
-      handle: "contact@karamjeet.sony",
-      link: "mailto:karamjeetsony8449@gmail.com",
-    },
-    {
-      icon: "/github.png",
-      label: "GitHub",
-      handle: "AayushVerma02",
-      link: "https://github.com/AayushVerma02",
-    },
-    {
-      icon: "/youtube.png",
-      label: "YouTube",
-      handle: "Karamjeet Sony",
-      link: "https://youtube.com/@",
-    },
-    {
-      icon: "/linkedin.png",
-      label: "LinkedIn",
-      handle: "Karamjeet Sony",
-      link: "https://linkedin.com/in/Karamjeet_Sony",
-    },
+    { icon: "/mail.png", label: "Email", handle: "contact@karamjeet.sony", link: "mailto:karamjeetsony8449@gmail.com" },
+    { icon: "/github.png", label: "GitHub", handle: "AayushVerma02", link: "https://github.com/AayushVerma02" },
+    { icon: "/youtube.png", label: "YouTube", handle: "Karamjeet Sony", link: "https://youtube.com/@" },
+    { icon: "/linkedin.png", label: "LinkedIn", handle: "Karamjeet Sony", link: "https://linkedin.com/in/Karamjeet_Sony" },
   ];
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  // Form State
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
-  // Change handler
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // Input Change Handler
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // Submit handler (no real backend here)
-  const handleSubmit = (e) => {
+  // Form Submit Handler
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+
+    // Basic Validation
+    if (!formData.name || !formData.email || !formData.message) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true);
+    
+    emailjs.send(
+      "NEXT_PUBLIC_EMAILJS_SERVICE_ID", 
+      "NEXT_PUBLIC_EMAILJS_TEMPLATE_ID", 
+      formData, 
+      "NEXT_PUBLIC_EMAILJS_PUBLIC_KEY"
+    ).then(() => {
+        alert("Message sent successfully!");
+        setFormData({ name: "", email: "", subject: "", message: "" }); // Reset form
+      })
+      .catch(() => alert("Failed to send message. Try again later."))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -55,9 +49,7 @@ export default function Connect() {
       {/* Title & Subtitle */}
       <div className="max-w-3xl w-full text-center mb-12">
         <h1 className="text-4xl font-bold text-white">Connect</h1>
-        <p className="text-gray-500 mt-2">
-          Connect with me through social media and other communication channels.
-        </p>
+        <p className="text-gray-500 mt-2">Reach out via social media or send me a message.</p>
       </div>
 
       {/* Main Container */}
@@ -65,66 +57,22 @@ export default function Connect() {
         {/* Left Column: Form */}
         <form
           onSubmit={handleSubmit}
-          className="flex-1 flex flex-col gap-6 bg-gray-900 p-6 rounded-lg shadow-md min-h-[400px]"
+          className="flex-1 flex flex-col gap-6 bg-gray-900 p-6 rounded-lg shadow-md min-h-[400px] w-full"
         >
           {/* Name */}
-          <div className="flex flex-col">
-            <label htmlFor="name" className="text-sm font-medium mb-1 text-gray-300">
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="Enter your name (e.g. Karamjeet Sony)"
-              className="bg-black border border-gray-700 rounded-md py-2 px-3 text-sm focus:ring-2 focus:ring-gray-500 transition-all"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </div>
-
+          <InputField id="name" label="Name" type="text" placeholder="Your Name" value={formData.name} onChange={handleChange} />
           {/* Email */}
-          <div className="flex flex-col">
-            <label htmlFor="email" className="text-sm font-medium mb-1 text-gray-300">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter your email (e.g. contact@Karamjeet.dev)"
-              className="bg-black border border-gray-700 rounded-md py-2 px-3 text-sm focus:ring-2 focus:ring-gray-500 transition-all"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-
+          <InputField id="email" label="Email" type="email" placeholder="Your Email" value={formData.email} onChange={handleChange} />
           {/* Subject */}
-          <div className="flex flex-col">
-            <label htmlFor="subject" className="text-sm font-medium mb-1 text-gray-300">
-              Subject
-            </label>
-            <input
-              id="subject"
-              name="subject"
-              type="text"
-              placeholder="Enter your subject (e.g. Just saying Hi!)"
-              className="bg-black border border-gray-700 rounded-md py-2 px-3 text-sm focus:ring-2 focus:ring-gray-500 transition-all"
-              value={formData.subject}
-              onChange={handleChange}
-            />
-          </div>
-
+          <InputField id="subject" label="Subject" type="text" placeholder="Subject" value={formData.subject} onChange={handleChange} />
           {/* Message */}
           <div className="flex flex-col">
-            <label htmlFor="message" className="text-sm font-medium mb-1 text-gray-300">
-              Message
-            </label>
+            <label htmlFor="message" className="text-sm font-medium mb-1 text-gray-300">Message</label>
             <textarea
               id="message"
               name="message"
               rows={4}
-              placeholder="Enter your message here..."
+              placeholder="Your message..."
               className="bg-black border border-gray-700 rounded-md py-2 px-3 text-sm focus:ring-2 focus:ring-gray-500 transition-all resize-none"
               value={formData.message}
               onChange={handleChange}
@@ -134,9 +82,10 @@ export default function Connect() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="mt-2 w-full bg-gray-700 border border-gray-600 rounded-md py-2 text-sm text-white hover:bg-gray-600 transition-transform transform hover:scale-105 cursor-pointer"
+            className={`mt-2 w-full bg-gray-700 border border-gray-600 rounded-md py-2 text-sm text-white transition-transform transform hover:scale-105 ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-600 cursor-pointer"}`}
+            disabled={loading}
           >
-            Submit
+            {loading ? "Sending..." : "Submit"}
           </button>
         </form>
 
@@ -152,13 +101,7 @@ export default function Connect() {
             >
               {/* Icon */}
               <div className="relative w-10 h-10 flex-shrink-0">
-                <Image
-                  src={item.icon}
-                  alt={item.label}
-                  width={40}
-                  height={40}
-                  className="object-contain"
-                />
+                <Image src={item.icon} alt={item.label} width={40} height={40} className="object-contain" />
               </div>
               {/* Text */}
               <div className="flex flex-col">
@@ -175,5 +118,23 @@ export default function Connect() {
         <p>Copyright © 2025 Karamjeet Sony</p>
       </div>
     </section>
+  );
+}
+
+// Reusable Input Component
+function InputField({ id, label, type, placeholder, value, onChange }) {
+  return (
+    <div className="flex flex-col">
+      <label htmlFor={id} className="text-sm font-medium mb-1 text-gray-300">{label}</label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        placeholder={placeholder}
+        className="bg-black border border-gray-700 rounded-md py-2 px-3 text-sm focus:ring-2 focus:ring-gray-500 transition-all"
+        value={value}
+        onChange={onChange}
+      />
+    </div>
   );
 }
