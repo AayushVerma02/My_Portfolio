@@ -32,10 +32,10 @@ export default function Connect() {
     setLoading(true);
     
     emailjs.send(
-      "NEXT_PUBLIC_EMAILJS_SERVICE_ID", 
-      "NEXT_PUBLIC_EMAILJS_TEMPLATE_ID", 
+      process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID, 
+      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, 
       formData, 
-      "NEXT_PUBLIC_EMAILJS_PUBLIC_KEY"
+      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
     ).then(() => {
         alert("Message sent successfully!");
         setFormData({ name: "", email: "", subject: "", message: "" }); // Reset form
